@@ -1,0 +1,16 @@
+{
+    "name": "LegendaryTools.HexGrid",
+    "rootNamespace": "",
+    "references": [
+        "GUID:1b3f41bcd77ed7243baafc0c2584b1df"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
