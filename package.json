@@ -11,7 +11,7 @@
     "url": "git+https://github.com/LeGustaVinho/hex-grid.git"
   },
   "dependencies": {
-    "com.legustavinho.legendary-tools-ai": "https://github.com/LeGustaVinho/legendary-tools-ai.git"
+    "com.legustavinho.legendary-tools-ai": "1.0.0"
   },
   "author": {
     "name": "LeGustaVinho",
