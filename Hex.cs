@@ -117,7 +117,7 @@ namespace LegendaryTools.Systems.HexGrid
 
         public static Hex operator +(Hex a, Hex b)
         {
-            return new Hex(a.Q + b.Q, a.Q + b.Q, a.S + a.S);
+            return new Hex(a.Q + b.Q, a.R + b.R, a.S + b.S);
         }
 
         public static Hex operator -(Hex a, Hex b)

@@ -7,9 +7,8 @@ namespace LegendaryTools.Systems.HexGrid
 {
     public class HexMapView : MonoBehaviour, IAStar<Hex>
     {
+        [Header("Pathfinding")] 
         public WorldHexLine AgentStartEnd;
-
-        public HexMap HexMap;
         public WorldHexLine[] LineWalls;
 
         [Header("Hex to Pixel Conversion")] 
@@ -19,6 +18,12 @@ namespace LegendaryTools.Systems.HexGrid
         [Header("Pixel to Hex Conversion")] 
         public Hex PixelToHexCoords;
         public Transform PixelToHexTransform;
+
+        [Header("Ring")] 
+        public int RingRadius;
+        public Transform RingCenterTransform;
+        
+        public HexMap HexMap;
         
         [Space]
         public int Radius = 10;
@@ -99,6 +104,16 @@ namespace LegendaryTools.Systems.HexGrid
                 else
                 {
                     Gizmos.color = Color.white;
+                }
+
+                if (RingRadius > 0 && RingCenterTransform != null)
+                {
+                    HashSet<Hex> ringHexes =
+                        new HashSet<Hex>(HexMap.Ring(HexMap.PixelToHex(RingCenterTransform.position), RingRadius));
+                    if(ringHexes.Contains(cell))
+                    {
+                        Gizmos.color = Color.yellow;
+                    }
                 }
 
                 HexMap.DrawCell(cell);

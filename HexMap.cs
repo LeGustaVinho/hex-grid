@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace LegendaryTools.Systems.HexGrid
@@ -8,6 +9,8 @@ namespace LegendaryTools.Systems.HexGrid
     {
         private readonly Layout layout;
         private readonly HashSet<Hex> map = new HashSet<Hex>();
+
+        public List<Hex> Hexes => map.ToList();
 
         public HexMap(Layout.WorldPlane plane, Layout.OrientationType orientationType, Vector3 size, Vector3 origin)
         {
@@ -109,6 +112,23 @@ namespace LegendaryTools.Systems.HexGrid
             }
 
             return cellsInRange.ToArray();
+        }
+
+        public Hex[] Ring(Hex center, int radius)
+        {
+            List<Hex> cellsInRing = new List<Hex>();
+            Hex direction = (Hex.Direction(4) * radius).Round();
+            Hex hex = center + direction;
+            for (int i = 0; i < 6; i++)
+            {
+                for (int j = 0; j < radius; j++)
+                {
+                    cellsInRing.Add(hex);
+                    hex = hex.Neighbor(i);
+                }
+            }
+
+            return cellsInRing.ToArray();
         }
 
         public Vector2 HexToPixel(Hex h)
