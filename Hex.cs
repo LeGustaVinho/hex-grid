@@ -2,11 +2,12 @@
 
 namespace LegendaryTools.Systems.HexGrid
 {
+    [Serializable]
     public struct Hex
     {
-        public readonly int Q;
-        public readonly int R;
-        public readonly int S;
+        public int Q;
+        public int R;
+        public int S;
 
         private static readonly Hex[] diagonals =
         {
@@ -94,12 +95,11 @@ namespace LegendaryTools.Systems.HexGrid
 
         public override bool Equals(object other)
         {
-            if (!(other is Hex))
+            if (!(other is Hex hex))
             {
                 return false;
             }
 
-            Hex hex = (Hex) other;
             return Q.Equals(hex.Q) && R.Equals(hex.R) && S.Equals(hex.S);
         }
 
@@ -112,7 +112,7 @@ namespace LegendaryTools.Systems.HexGrid
 
         public override string ToString()
         {
-            return string.Format("({0:F1}, {1:F1},  {2:F1})", Q, R, S);
+            return $"({Q:F1}, {R:F1},  {S:F1})";
         }
 
         public static Hex operator +(Hex a, Hex b)

@@ -9,9 +9,9 @@ namespace LegendaryTools.Systems.HexGrid
         private readonly Layout layout;
         private readonly HashSet<Hex> map = new HashSet<Hex>();
 
-        public HexMap(Layout.WorldPlane plane, Orientation orientation, Vector3 size, Vector3 origin)
+        public HexMap(Layout.WorldPlane plane, Layout.OrientationType orientationType, Vector3 size, Vector3 origin)
         {
-            layout = new Layout(plane, orientation, size, origin);
+            layout = new Layout(plane, orientationType, size, origin);
         }
 
         public void Add(Hex item)
@@ -111,9 +111,9 @@ namespace LegendaryTools.Systems.HexGrid
             return cellsInRange.ToArray();
         }
 
-        public Vector3 HexToPixel(Hex h)
+        public Vector2 HexToPixel(Hex h)
         {
-            return layout.HexToPixel(h);
+            return layout.HexToPixel(h, true);
         }
 
         public Hex PixelToHex(Vector3 p)
@@ -133,7 +133,7 @@ namespace LegendaryTools.Systems.HexGrid
             }
         }
 
-        public void RetangularlShape(int width, int height)
+        public void RectangularShape(int width, int height)
         {
             map.Clear();
             for (int q = 0; q < width; q++)

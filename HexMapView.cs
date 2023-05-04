@@ -11,11 +11,24 @@ namespace LegendaryTools.Systems.HexGrid
 
         public HexMap HexMap;
         public WorldHexLine[] LineWalls;
+
+        [Header("Hex to Pixel Conversion")] 
+        public Hex HexToPixelCoords;
+        public Transform HexToPixelTransform;
+        
+        [Header("Pixel to Hex Conversion")] 
+        public Hex PixelToHexCoords;
+        public Transform PixelToHexTransform;
+        
+        [Space]
+        public int Radius = 10;
+        public Vector2 CellSize = new Vector2(10, 10);
+        public Layout.WorldPlane Plane = Layout.WorldPlane.XY;
+        public Layout.OrientationType Orientation = Layout.OrientationType.Flat;
+
         private List<Hex> neighborsBuffer = new List<Hex>();
         private HashSet<Hex> Path = new HashSet<Hex>();
-
-        public AStar<Hex> Pathfinding;
-
+        private AStar<Hex> Pathfinding;
         private HashSet<Hex> Walls = new HashSet<Hex>();
 
         public int MapLocationsAmount => HexMap.Count;
@@ -39,15 +52,12 @@ namespace LegendaryTools.Systems.HexGrid
         {
             return 0;
         }
-
-        // Update is called once per frame
+        
         private void OnDrawGizmos()
         {
             if (HexMap == null)
             {
-                HexMap = new HexMap(Layout.WorldPlane.XY, Layout.Flat, new Vector3(10, 10, 10), Vector3.zero);
-                HexMap.HexagonalShape(10);
-                Pathfinding = new AStar<Hex>(this);
+                RecreateHexGrid();
             }
 
             if (LineWalls != null)
@@ -93,6 +103,24 @@ namespace LegendaryTools.Systems.HexGrid
 
                 HexMap.DrawCell(cell);
             }
+
+            if (HexToPixelTransform != null)
+            {
+                HexToPixelTransform.position = HexMap.HexToPixel(HexToPixelCoords);
+            }
+            
+            if (PixelToHexTransform != null)
+            {
+                PixelToHexCoords = HexMap.PixelToHex(PixelToHexTransform.position);
+            }
+        }
+
+        [ContextMenu("RecreateHexGrid")]
+        private void RecreateHexGrid()
+        {
+            HexMap = new HexMap(Plane, Orientation, CellSize, transform.position);
+            HexMap.HexagonalShape(Radius);
+            Pathfinding = new AStar<Hex>(this);
         }
 
         [Serializable]

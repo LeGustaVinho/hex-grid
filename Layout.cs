@@ -10,6 +10,12 @@ namespace LegendaryTools.Systems.HexGrid
             XZ
         }
 
+        public enum OrientationType
+        {
+            Pointy,
+            Flat,
+        }
+
         public readonly WorldPlane Plane;
         public readonly Orientation Orientation;
         public readonly Vector3 Size;
@@ -21,28 +27,34 @@ namespace LegendaryTools.Systems.HexGrid
         public static readonly Orientation Flat = new Orientation(3.0f / 2.0f, 0.0f, Mathf.Sqrt(3.0f) / 2.0f,
             Mathf.Sqrt(3.0f), 2.0f / 3.0f, 0.0f, -1.0f / 3.0f, Mathf.Sqrt(3.0f) / 3.0f, 0.0f);
 
-        public Layout(WorldPlane plane, Orientation orientation, Vector3 size, Vector3 origin)
+        public Layout(WorldPlane plane, OrientationType orientationType, Vector3 size, Vector3 origin)
         {
             Plane = plane;
-            Orientation = orientation;
+            Orientation = orientationType == OrientationType.Flat ? Flat : Pointy;
             Size = size;
-            Origin = origin;
+            Origin = Plane == WorldPlane.XZ ? new Vector3(origin.x, origin.z, 0) : origin;
         }
 
-        public Vector3 HexToPixel(Hex h)
+        public Vector2 HexToPixel(Hex h, bool convertPlane = false)
         {
             float x = Origin.x + (Orientation.F0 * h.Q + Orientation.F1 * h.R) * Size.x;
             float y = Origin.y + (Orientation.F2 * h.Q + Orientation.F3 * h.R) * Size.y;
 
-            return coordForPlane(Plane, x, y);
+            return convertPlane ? coordForPlane(Plane, x, y) : new Vector2(x, y);
         }
 
-        public Hex PixelToHex(Vector3 p)
+        public Hex PixelToHex(Vector3 pixelPosition)
         {
-            float x = (p.x - Origin.x) / Size.x;
-            float y = (p.y - Origin.y) / Size.y;
+            if (Plane == WorldPlane.XZ)
+            {
+                pixelPosition.y = pixelPosition.z;
+                pixelPosition.z = 0;
+            }
+            
+            float x = (pixelPosition.x - Origin.x) / Size.x;
+            float y = (pixelPosition.y - Origin.y) / Size.y;
 
-            Vector3 pt = coordForPlane(Plane, x, y);
+            Vector3 pt = new Vector3(x, y, 0);
 
             float q = Orientation.B0 * pt.x + Orientation.B1 * pt.y;
             float r = Orientation.B2 * pt.x + Orientation.B3 * pt.y;
@@ -50,28 +62,26 @@ namespace LegendaryTools.Systems.HexGrid
             return new FractionalHex(q, r, -q - r).Round();
         }
 
-        public Vector3 HexCornerOffset(int corner)
+        public Vector2 HexCornerOffset(int corner)
         {
             float angle = 2.0f * Mathf.PI * (Orientation.StartAngle - corner) / 6.0f;
 
             float x = Size.x * Mathf.Cos(angle);
             float y = Size.y * Mathf.Sin(angle);
 
-            return coordForPlane(Plane, x, y);
+            return new Vector2(x, y);
         }
 
         public Vector3[] PolygonCorners(Hex h)
         {
             Vector3[] corners = new Vector3[6];
             Vector3 center = HexToPixel(h);
-            Vector3 offset;
-            float x, y;
 
             for (int i = 0; i < 6; i++)
             {
-                offset = HexCornerOffset(i);
-                x = center.x + offset.x;
-                y = center.y + offset.y;
+                Vector2 offset = HexCornerOffset(i);
+                float x = center.x + offset.x;
+                float y = center.y + offset.y;
 
                 corners[i] = coordForPlane(Plane, x, y);
             }
