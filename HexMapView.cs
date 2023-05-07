@@ -116,12 +116,12 @@ namespace LegendaryTools.Systems.HexGrid
                     }
                 }
 
-                HexMap.DrawCell(cell);
+                HexMap.DrawCellGizmos(cell);
             }
 
             if (HexToPixelTransform != null)
             {
-                HexToPixelTransform.position = HexMap.HexToPixel(HexToPixelCoords);
+                HexToPixelTransform.position = HexMap.HexToPosition(HexToPixelCoords, Plane == Layout.WorldPlane.XY ? transform.position.z : transform.position.y);
             }
             
             if (PixelToHexTransform != null)

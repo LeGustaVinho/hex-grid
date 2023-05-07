@@ -35,12 +35,24 @@ namespace LegendaryTools.Systems.HexGrid
             Origin = Plane == WorldPlane.XZ ? new Vector3(origin.x, origin.z, 0) : origin;
         }
 
-        public Vector2 HexToPixel(Hex h, bool convertPlane = false)
+        public Vector2 HexToPixel(Hex h)
         {
             float x = Origin.x + (Orientation.F0 * h.Q + Orientation.F1 * h.R) * Size.x;
             float y = Origin.y + (Orientation.F2 * h.Q + Orientation.F3 * h.R) * Size.y;
 
-            return convertPlane ? coordForPlane(Plane, x, y) : new Vector2(x, y);
+            return new Vector2(x, y);
+        }
+        
+        public Vector3 HexToPosition(Hex h, float elevation)
+        {
+            Vector2 pixelCoords = HexToPixel(h);
+            switch (Plane)
+            {
+                case WorldPlane.XY: return new Vector3(pixelCoords.x, pixelCoords.y, elevation);
+                case WorldPlane.XZ: return new Vector3(pixelCoords.x, elevation, pixelCoords.y);
+            }
+
+            return Vector3.zero;
         }
 
         public Hex PixelToHex(Vector3 pixelPosition)
@@ -75,7 +87,7 @@ namespace LegendaryTools.Systems.HexGrid
         public Vector3[] PolygonCorners(Hex h)
         {
             Vector3[] corners = new Vector3[6];
-            Vector3 center = HexToPixel(h);
+            Vector2 center = HexToPixel(h);
 
             for (int i = 0; i < 6; i++)
             {

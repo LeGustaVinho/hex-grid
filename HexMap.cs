@@ -7,14 +7,15 @@ namespace LegendaryTools.Systems.HexGrid
 {
     public class HexMap : ICollection<Hex>
     {
-        private readonly Layout layout;
-        private readonly HashSet<Hex> map = new HashSet<Hex>();
+        public Layout Layout { get; private set; }
+        [SerializeField]
+        private HashSet<Hex> map = new HashSet<Hex>();
 
-        public List<Hex> Hexes => map.ToList();
+        public HashSet<Hex> Hexes => new HashSet<Hex>(map);
 
         public HexMap(Layout.WorldPlane plane, Layout.OrientationType orientationType, Vector3 size, Vector3 origin)
         {
-            layout = new Layout(plane, orientationType, size, origin);
+            Layout = new Layout(plane, orientationType, size, origin);
         }
 
         public void Add(Hex item)
@@ -59,17 +60,27 @@ namespace LegendaryTools.Systems.HexGrid
         {
             foreach (Hex cell in map)
             {
-                DrawCell(cell);
+                DrawCellGizmos(cell);
             }
         }
 
-        public void DrawCell(Hex cell)
+        public void DrawCellGizmos(Hex cell)
         {
-            Vector3[] corners = layout.PolygonCorners(cell);
+            Vector3[] corners = Layout.PolygonCorners(cell);
 
             for (int i = 0; i < corners.Length; i++)
             {
                 Gizmos.DrawLine(corners[i], i != corners.Length - 1 ? corners[i + 1] : corners[0]);
+            }
+        }
+        
+        public void DrawCellDebug(Hex cell, Color color, float duration)
+        {
+            Vector3[] corners = Layout.PolygonCorners(cell);
+
+            for (int i = 0; i < corners.Length; i++)
+            {
+                Debug.DrawLine(corners[i], i != corners.Length - 1 ? corners[i + 1] : corners[0], color, duration);
             }
         }
 
@@ -103,7 +114,7 @@ namespace LegendaryTools.Systems.HexGrid
             {
                 for (int r = Mathf.Max(-range, -q - range); r <= Mathf.Min(range, -q + range); r++)
                 {
-                    current = new Hex(q, r);
+                    current = center + new Hex(q, r);
                     if (map.Contains(current))
                     {
                         cellsInRange.Add(current);
@@ -117,6 +128,11 @@ namespace LegendaryTools.Systems.HexGrid
         public Hex[] Ring(Hex center, int radius)
         {
             List<Hex> cellsInRing = new List<Hex>();
+            if (radius == 0)
+            {
+                cellsInRing.Add(center);
+                return cellsInRing.ToArray();
+            }
             Hex direction = (Hex.Direction(4) * radius).Round();
             Hex hex = center + direction;
             for (int i = 0; i < 6; i++)
@@ -133,12 +149,17 @@ namespace LegendaryTools.Systems.HexGrid
 
         public Vector2 HexToPixel(Hex h)
         {
-            return layout.HexToPixel(h, true);
+            return Layout.HexToPixel(h);
+        }
+        
+        public Vector3 HexToPosition(Hex h, float elevation)
+        {
+            return Layout.HexToPosition(h, elevation);
         }
 
         public Hex PixelToHex(Vector3 p)
         {
-            return layout.PixelToHex(p);
+            return Layout.PixelToHex(p);
         }
 
         public void HexagonalShape(int size)
